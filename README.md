@@ -271,14 +271,3 @@ Sistema listo para producción con:
 - Experiencia conversacional realista  
 
 ---
-
-## 🧠 Nivel del proyecto
-
-Este proyecto supera un chatbot básico al incluir:
-
-- ✔ Memoria (stateful)  
-- ✔ Control de reglas  
-- ✔ RAG con fuente externa  
-- ✔ Arquitectura desplegada  
-
-👉 Nivel: **Avanzado (cercano a producción real)**
