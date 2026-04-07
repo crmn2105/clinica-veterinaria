@@ -74,28 +74,43 @@ class handler(BaseHTTPRequestHandler):
 
             if should_use_availability_tool:
                 species = "cat"
+                species_label = "cat"
+
                 if "dog" in user_msg_lower or "perro" in user_msg_lower:
                     species = "dog"
+                    species_label = "dog"
+                elif "gato" in user_msg_lower:
+                    species = "cat"
+                    species_label = "cat"
 
                 day = "monday"
+                day_label = "Monday"
+
                 day_map = {
-                    "monday": "monday",
-                    "lunes": "monday",
-                    "tuesday": "tuesday",
-                    "martes": "tuesday",
-                    "wednesday": "wednesday",
-                    "miercoles": "wednesday",
-                    "miércoles": "wednesday",
-                    "thursday": "thursday",
-                    "jueves": "thursday",
+                    "monday": ("monday", "Monday"),
+                    "lunes": ("monday", "Monday"),
+                    "tuesday": ("tuesday", "Tuesday"),
+                    "martes": ("tuesday", "Tuesday"),
+                    "wednesday": ("wednesday", "Wednesday"),
+                    "miercoles": ("wednesday", "Wednesday"),
+                    "miércoles": ("wednesday", "Wednesday"),
+                    "thursday": ("thursday", "Thursday"),
+                    "jueves": ("thursday", "Thursday"),
                 }
 
-                for raw_day, normalized_day in day_map.items():
+                for raw_day, values in day_map.items():
                     if raw_day in user_msg_lower:
-                        day = normalized_day
+                        day, day_label = values
                         break
 
                 tool_result = check_availability(species, day)
+
+                natural_reply = (
+                    f"For {species_label}s, {day_label} is "
+                    f"{'available' if tool_result['available'] else 'not available'}. "
+                    f"{tool_result['reason']} "
+                    f"You can consider: {', '.join(tool_result['slots'])}."
+                )
 
                 self.send_response(200)
                 self.send_header("Content-type", "application/json; charset=utf-8")
@@ -106,12 +121,7 @@ class handler(BaseHTTPRequestHandler):
                     "msg": user_msg,
                     "tool_used": "check_availability",
                     "tool_result": tool_result,
-                    "respuesta": (
-                        f"Availability check completed for {species} on {day}. "
-                        f"Available: {tool_result['available']}. "
-                        f"Reason: {tool_result['reason']}. "
-                        f"Suggested slots: {tool_result['slots']}"
-                    )
+                    "respuesta": natural_reply
                 }, ensure_ascii=False).encode("utf-8"))
                 return
 
