@@ -120,7 +120,24 @@ El sistema mantiene contexto mediante `session_id`.
 
 ---
 
-## 📚 Retrieval-Augmented Generation (RAG)
+## 📚 RAG (Retrieval-Augmented Generation)
+
+El sistema utiliza recuperación de información externa para mejorar la precisión de las respuestas.
+
+Cuando el usuario realiza preguntas sobre preparación preoperatoria:
+
+- Se consulta una fuente externa oficial  
+- Se añade contexto al modelo  
+- Se indica en la respuesta si se ha utilizado RAG  
+
+Campos en la respuesta:
+
+- `rag_used` → indica si se ha utilizado contexto externo  
+- `rag_source` → URL de la fuente utilizada  
+
+---
+
+## 📚 Implementación de RAG en el sistema
 
 El sistema incorpora **RAG** para mejorar la precisión en respuestas críticas.
 
