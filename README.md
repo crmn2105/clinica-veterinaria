@@ -103,3 +103,41 @@ Componentes:
 GET /api/health
 
 Ejemplo:
+---
+
+## 📊 Trazabilidad con requisitos del curso
+
+Este proyecto implementa los requisitos definidos en el backlog del sistema veterinario:
+
+### ✔ VET-7 — Backend API
+- API REST implementada
+- Endpoints funcionales (/api, /api/health)
+- Despliegue en Vercel
+
+### ✔ VET-9 — LLM Integration
+- Integración con OpenAI
+- Generación de respuestas dinámicas
+- Uso de contexto del dominio veterinario
+
+### ✔ Conversaciones (1–7)
+El chatbot responde correctamente a:
+
+- Saludos
+- Solicitudes de esterilización
+- Preguntas sobre horarios
+- Validación de restricciones (celo, edad, etc.)
+- Rechazo de casos fuera de alcance
+- Redirección en emergencias
+
+---
+
+## 🧾 Documentación adicional
+
+El proyecto incluye:
+
+- Intents del chatbot
+- Conversaciones de validación
+- Casos de uso del sistema
+- Backlog en Jira
+
+Estos documentos permiten validar el comportamiento del sistema según la especificación.
