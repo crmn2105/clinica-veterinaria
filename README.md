@@ -8,7 +8,11 @@ API backend para un chatbot de clínica veterinaria enfocado en la **gestión de
 
 API en producción:
 
-https://clinica-veterinaria-crmn.vercel.app/api
+👉 https://clinica-veterinaria-crmn.vercel.app/api
+
+Health check:
+
+👉 https://clinica-veterinaria-crmn.vercel.app/api/health
 
 ---
 
@@ -24,11 +28,11 @@ Este sistema implementa un chatbot especializado en la **gestión de citas de es
 
 El chatbot está diseñado para:
 
-- Informar sobre esterilización
-- Gestionar citas
-- Explicar requisitos preoperatorios
-- Resolver dudas logísticas
-- Mantener contexto conversacional (multi-turno)
+- Informar sobre esterilización  
+- Gestionar citas  
+- Explicar requisitos preoperatorios  
+- Resolver dudas logísticas  
+- Mantener contexto conversacional (multi-turno)  
 
 ---
 
@@ -49,16 +53,16 @@ El sistema NO está diseñado para:
 El sistema implementa reglas explícitas del dominio veterinario:
 
 ### 🧪 Analítica preoperatoria
-- Obligatoria en animales mayores de 6 años
-- Recomendada en animales jóvenes
+- Obligatoria en animales mayores de 6 años  
+- Recomendada en animales jóvenes  
 
 ### 🔥 Restricción por celo
-- No se puede esterilizar una perra en celo
-- Espera recomendada: 2 meses tras finalizar el celo
+- No se puede esterilizar una perra en celo  
+- Espera recomendada: 2 meses tras finalizar el celo  
 
 ### 🍽️ Ayuno
-- Comida: 8–12 horas antes
-- Agua: hasta 1–2 horas antes
+- Comida: 8–12 horas antes  
+- Agua: hasta 1–2 horas antes  
 
 ### 🐾 Requisitos
 - Vacunación al día  
@@ -87,18 +91,18 @@ El sistema implementa reglas explícitas del dominio veterinario:
 
 ## 🤖 Arquitectura del Sistema
 
-El sistema sigue una arquitectura basada en API:
+Flujo del sistema:
 
-Usuario → API (Python en Vercel) → OpenAI → Respuesta
+Usuario → API → Memoria → RAG → OpenAI → Respuesta
 
-### Componentes:
+### Componentes
 
-- Backend en Python (Serverless)
-- API REST desplegada en Vercel
-- Integración con OpenAI (LLM)
-- Lógica basada en reglas del dominio
-- Memoria conversacional (session_id)
-- RAG (Retrieval-Augmented Generation)
+- Backend en Python (Serverless)  
+- API REST desplegada en Vercel  
+- Integración con OpenAI (LLM)  
+- Lógica basada en reglas del dominio  
+- Memoria conversacional (`session_id`)  
+- RAG (Retrieval-Augmented Generation)  
 
 ---
 
@@ -106,55 +110,60 @@ Usuario → API (Python en Vercel) → OpenAI → Respuesta
 
 El sistema mantiene contexto mediante `session_id`.
 
-Ejemplo:
+### Ejemplo real
 
-/api?msg=tengo un gato&session_id=1  
-/api?msg=y si tuviera 7 años?&session_id=1  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=tengo%20un%20gato&session_id=2  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=y%20si%20tuviera%207%20años&session_id=2  
 
-✔ Permite conversaciones multi-turno  
+✔ Conversación multi-turno  
 ✔ Mantiene coherencia entre preguntas  
 
 ---
 
-## 🧠 Retrieval-Augmented Generation (RAG)
+## 📚 Retrieval-Augmented Generation (RAG)
 
-El sistema incorpora un mecanismo de **RAG** para mejorar la precisión en respuestas críticas.
+El sistema incorpora **RAG** para mejorar la precisión en respuestas críticas.
 
 ### 📌 Cuándo se activa
 
 Cuando el usuario pregunta sobre:
 
-- Ayuno
-- Agua
-- Instrucciones preoperatorias
+- Ayuno  
+- Agua  
+- Instrucciones preoperatorias  
 
-### ⚙️ Cómo funciona
+### ⚙️ Funcionamiento
 
 1. Se detecta intención del usuario  
 2. Se recupera contexto relevante  
-3. Se inyecta en el prompt del modelo  
-4. El modelo responde usando SOLO ese contexto  
+3. Se añade al prompt del modelo  
+4. El modelo responde usando ese contexto  
 
 ### 🔗 Fuente utilizada
 
-https://veterinary-clinic-teal.vercel.app/en/docs/instructions-before-operation
+👉 https://veterinary-clinic-teal.vercel.app/en/docs/instructions-before-operation
 
 ### 🎯 Beneficios
 
 - Evita alucinaciones del modelo  
 - Garantiza coherencia clínica  
-- Alinea respuestas con documentación oficial  
+- Usa información real  
 
-### 🧪 Ejemplo
+### 🧪 Ejemplo real
 
-/api?msg=y puede beber agua&session_id=3  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=y%20puede%20beber%20agua&session_id=3  
 
-Respuesta incluye:
+Respuesta:
 
+```json
 {
+  "session_id": "3",
+  "msg": "y puede beber agua",
+  "respuesta": "...",
   "rag_used": true,
   "rag_source": "https://veterinary-clinic-teal.vercel.app/en/docs/instructions-before-operation"
 }
+```
 
 ---
 
@@ -166,7 +175,7 @@ GET /api?msg=texto&session_id=id
 
 Ejemplo:
 
-/api?msg=hola
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=hola  
 
 ---
 
@@ -176,10 +185,12 @@ GET /api/health
 
 Respuesta:
 
+```json
 {
   "status": "ok",
   "service": "veterinary-chatbot-api"
 }
+```
 
 ---
 
@@ -187,17 +198,21 @@ Respuesta:
 
 ### Conversación básica
 
-/api?msg=hola  
-/api?msg=quiero esterilizar a mi gato  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=hola  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=quiero%20esterilizar%20a%20mi%20gato  
 
-### Conversación con contexto
+---
 
-/api?msg=tengo un gato&session_id=2  
-/api?msg=y si tuviera 7 años?&session_id=2  
+### Conversación con memoria
+
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=tengo%20un%20gato&session_id=2  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=y%20si%20tuviera%207%20años&session_id=2  
+
+---
 
 ### RAG activado
 
-/api?msg=puede beber agua antes de la cirugía&session_id=3  
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=puede%20beber%20agua%20antes%20de%20la%20cirugia&session_id=3  
 
 ---
 
@@ -214,6 +229,7 @@ Respuesta:
 - Uso de contexto del dominio  
 
 ### ✔ Conversaciones (1–7)
+
 El chatbot responde correctamente a:
 
 - Saludos  
@@ -239,10 +255,10 @@ El proyecto incluye:
 ## 📦 Información del Proyecto
 
 Repositorio:  
-https://github.com/crmn2105/clinica-veterinaria  
+👉 https://github.com/crmn2105/clinica-veterinaria  
 
 API desplegada:  
-https://clinica-veterinaria-crmn.vercel.app/api  
+👉 https://clinica-veterinaria-crmn.vercel.app/api  
 
 ---
 
@@ -266,8 +282,6 @@ Este proyecto implementa un sistema completo de chatbot basado en:
 Sistema listo para producción con:
 
 - Alta coherencia  
-- Control de dominio  
+- Control del dominio  
 - Reducción de errores del modelo  
 - Experiencia conversacional realista  
-
----
