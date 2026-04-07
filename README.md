@@ -141,3 +141,23 @@ El proyecto incluye:
 - Backlog en Jira
 
 Estos documentos permiten validar el comportamiento del sistema según la especificación.
+Proyecto: Veterinary Chatbot API
+
+Repositorio:
+https://github.com/crmn2105/clinica-veterinaria
+
+API desplegada:
+https://clinica-veterinaria-crmn.vercel.app/api
+
+Descripción:
+Sistema backend de chatbot para gestión de esterilización veterinaria, implementado con API REST y desplegado en Vercel.
+
+Incluye:
+
+Lógica basada en reglas del dominio
+Integración con LLM (OpenAI)
+Endpoints funcionales
+Casos de prueba
+Documentación completa en README
+
+El proyecto sigue metodología Spec First (SDD) y cumple los requisitos del curso.
