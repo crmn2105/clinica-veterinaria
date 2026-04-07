@@ -93,7 +93,7 @@ El sistema implementa reglas explícitas del dominio veterinario:
 
 Flujo del sistema:
 
-Usuario → API → Memoria → RAG → OpenAI → Respuesta
+Usuario → API → Memoria → RAG → Tool → OpenAI → Respuesta
 
 ### Componentes
 
@@ -103,6 +103,7 @@ Usuario → API → Memoria → RAG → OpenAI → Respuesta
 - Lógica basada en reglas del dominio  
 - Memoria conversacional (`session_id`)  
 - RAG (Retrieval-Augmented Generation)  
+- Tool de disponibilidad  
 
 ---
 
@@ -137,9 +138,7 @@ Campos en la respuesta:
 
 ---
 
-## 📚 Implementación de RAG en el sistema
-
-El sistema incorpora **RAG** para mejorar la precisión en respuestas críticas.
+## 📚 Implementación de RAG
 
 ### 📌 Cuándo se activa
 
@@ -170,8 +169,6 @@ Cuando el usuario pregunta sobre:
 
 👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=y%20puede%20beber%20agua&session_id=3  
 
-Respuesta:
-
 ```json
 {
   "session_id": "3",
@@ -184,13 +181,45 @@ Respuesta:
 
 ---
 
+## 🛠️ Availability Tool
+
+El sistema incluye una **tool de disponibilidad** para evitar que el modelo invente citas.
+
+### 🎯 Propósito
+
+- Simular disponibilidad de agenda  
+- Aplicar reglas de capacidad  
+- Evitar respuestas ficticias del modelo  
+
+### ⚙️ Funcionamiento
+
+1. Se detectan preguntas de disponibilidad  
+2. Se llama a `check_availability()`  
+3. Se devuelve resultado estructurado  
+4. El modelo NO decide disponibilidad  
+
+### 🧪 Ejemplo real
+
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=availability%20for%20dog%20on%20thursday&session_id=99  
+
+```json
+{
+  "tool_used": "check_availability",
+  "tool_result": {
+    "available": false,
+    "reason": "That day is full for dogs under current capacity rules.",
+    "slots": ["monday", "tuesday", "wednesday"]
+  }
+}
+```
+
+---
+
 ## 📡 Endpoints
 
 ### 🔹 Chat endpoint
 
 GET /api?msg=texto&session_id=id
-
-Ejemplo:
 
 👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=hola  
 
@@ -199,8 +228,6 @@ Ejemplo:
 ### 🔹 Health Check
 
 GET /api/health
-
-Respuesta:
 
 ```json
 {
@@ -230,6 +257,12 @@ Respuesta:
 ### RAG activado
 
 👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=puede%20beber%20agua%20antes%20de%20la%20cirugia&session_id=3  
+
+---
+
+### Tool activada
+
+👉 https://clinica-veterinaria-crmn.vercel.app/api?msg=availability%20for%20dog%20on%20thursday&session_id=99  
 
 ---
 
@@ -288,6 +321,7 @@ Este proyecto implementa un sistema completo de chatbot basado en:
 - Reglas de negocio explícitas  
 - Memoria conversacional  
 - RAG para control de precisión  
+- Tool para lógica determinista  
 
 👉 Siguiendo metodología **Spec First (SDD)**  
 👉 Cumpliendo los requisitos del curso  
@@ -301,4 +335,5 @@ Sistema listo para producción con:
 - Alta coherencia  
 - Control del dominio  
 - Reducción de errores del modelo  
+- Respuestas deterministas en disponibilidad  
 - Experiencia conversacional realista  
