@@ -4,6 +4,7 @@ import json
 import os
 from openai import OpenAI
 from api.session_id import get_history, save_history
+from api.rag_data import retrieve_preop_context, RAG_SOURCE_URL
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -48,10 +49,23 @@ class handler(BaseHTTPRequestHandler):
             session_id = params.get("session_id", ["default"])[0].strip()
 
             history = get_history(session_id)
+            rag_context = retrieve_preop_context(user_msg)
 
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT}
             ]
+
+            if rag_context:
+                messages.append({
+                    "role": "system",
+                    "content": (
+                        f"Use this retrieved pre-operative context from the official clinic "
+                        f"instructions source ({RAG_SOURCE_URL}). "
+                        f"When the user asks about fasting, water, or pre-operative instructions, "
+                        f"you must answer strictly from this context and not override it with general knowledge.\n\n"
+                        f"{rag_context}"
+                    )
+                })
 
             for past_user_msg, past_bot_msg in history:
                 messages.append({"role": "user", "content": past_user_msg})
@@ -76,7 +90,9 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({
                 "session_id": session_id,
                 "msg": user_msg,
-                "respuesta": reply
+                "respuesta": reply,
+                "rag_used": bool(rag_context),
+                "rag_source": RAG_SOURCE_URL if rag_context else None
             }, ensure_ascii=False).encode("utf-8"))
 
         except Exception as e:
