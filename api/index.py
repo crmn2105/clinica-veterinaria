@@ -5,6 +5,7 @@ import os
 from openai import OpenAI
 from api.session_id import get_history, save_history
 from api.rag_data import retrieve_preop_context, RAG_SOURCE_URL
+from api.availability import check_availability
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -47,6 +48,72 @@ class handler(BaseHTTPRequestHandler):
 
             user_msg = params.get("msg", ["Hola"])[0].strip()
             session_id = params.get("session_id", ["default"])[0].strip()
+
+            user_msg_lower = user_msg.lower()
+
+            availability_keywords = [
+                "availability", "available", "slot", "slots", "capacity",
+                "book", "booking", "next week",
+                "disponibilidad", "disponible", "hueco", "huecos",
+                "cita", "reservar", "reserva"
+            ]
+
+            day_candidates = [
+                "monday", "tuesday", "wednesday", "thursday",
+                "lunes", "martes", "miercoles", "miércoles", "jueves"
+            ]
+
+            should_use_availability_tool = (
+                any(keyword in user_msg_lower for keyword in availability_keywords)
+                and (
+                    "cat" in user_msg_lower or "dog" in user_msg_lower
+                    or "gato" in user_msg_lower or "perro" in user_msg_lower
+                    or any(day in user_msg_lower for day in day_candidates)
+                )
+            )
+
+            if should_use_availability_tool:
+                species = "cat"
+                if "dog" in user_msg_lower or "perro" in user_msg_lower:
+                    species = "dog"
+
+                day = "monday"
+                day_map = {
+                    "monday": "monday",
+                    "lunes": "monday",
+                    "tuesday": "tuesday",
+                    "martes": "tuesday",
+                    "wednesday": "wednesday",
+                    "miercoles": "wednesday",
+                    "miércoles": "wednesday",
+                    "thursday": "thursday",
+                    "jueves": "thursday",
+                }
+
+                for raw_day, normalized_day in day_map.items():
+                    if raw_day in user_msg_lower:
+                        day = normalized_day
+                        break
+
+                tool_result = check_availability(species, day)
+
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.end_headers()
+
+                self.wfile.write(json.dumps({
+                    "session_id": session_id,
+                    "msg": user_msg,
+                    "tool_used": "check_availability",
+                    "tool_result": tool_result,
+                    "respuesta": (
+                        f"Availability check completed for {species} on {day}. "
+                        f"Available: {tool_result['available']}. "
+                        f"Reason: {tool_result['reason']}. "
+                        f"Suggested slots: {tool_result['slots']}"
+                    )
+                }, ensure_ascii=False).encode("utf-8"))
+                return
 
             history = get_history(session_id)
             rag_context = retrieve_preop_context(user_msg)
