@@ -105,12 +105,18 @@ class handler(BaseHTTPRequestHandler):
 
                 tool_result = check_availability(species, day)
 
-                natural_reply = (
-                    f"For {species_label}s, {day_label} is "
-                    f"{'available' if tool_result['available'] else 'not available'}. "
-                    f"{tool_result['reason']} "
-                    f"You can consider: {', '.join(tool_result['slots'])}."
-                )
+                if tool_result["available"]:
+                    natural_reply = (
+                        f"Yes, we have availability for your {species_label} on {day_label}. "
+                        f"Would you like to book it?"
+                    )
+                else:
+                    suggested = ", ".join(tool_result["slots"])
+                    natural_reply = (
+                        f"No, we don’t have availability for your {species_label} on {day_label}. "
+                        f"{tool_result['reason']} "
+                        f"We do have availability on: {suggested}. Would any of those work for you?"
+                    )
 
                 self.send_response(200)
                 self.send_header("Content-type", "application/json; charset=utf-8")
